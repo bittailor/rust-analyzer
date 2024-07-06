@@ -26,7 +26,7 @@ export class Cargo {
 
     // Made public for testing purposes
     static artifactSpec(args: readonly string[]): ArtifactSpec {
-        const cargoArgs = [...args, "--message-format=json"];
+        let cargoArgs = Cargo.pushEndOfCargoArgs(args, "--message-format=json");
 
         // arguments for a runnable from the quick pick should be updated.
         // see crates\rust-analyzer\src\main_loop\handlers.rs, handle_code_lens
@@ -36,7 +36,7 @@ export class Cargo {
                 break;
             case "test": {
                 if (!cargoArgs.includes("--no-run")) {
-                    cargoArgs.push("--no-run");
+                    cargoArgs = Cargo.pushEndOfCargoArgs(cargoArgs, "--no-run");    
                 }
                 break;
             }
@@ -50,6 +50,13 @@ export class Cargo {
         }
 
         return result;
+    }
+
+    private static pushEndOfCargoArgs(cargoArgs: readonly string[], arg: string): string[] {
+        // add arg before the first `--` or at the end
+        const idx = cargoArgs.indexOf("--");
+        return idx === -1 ? [...cargoArgs, arg] : [...cargoArgs.slice(0, idx), arg, ...cargoArgs.slice(idx)]; 
+       
     }
 
     private async getArtifacts(spec: ArtifactSpec): Promise<CompilationArtifact[]> {

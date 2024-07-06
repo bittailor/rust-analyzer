@@ -95,5 +95,22 @@ export async function getTests(ctx: Context) {
             ]);
             assert.notDeepStrictEqual(args.filter, undefined);
         });
+
+        suite.addTest("A test with costum args", async () => {
+            const args = Cargo.artifactSpec(["test", "--package", "pkg_name", "--lib", "--", "test::it_works", "--show-output" ]);
+
+            assert.deepStrictEqual(args.cargoArgs, [
+                "test",
+                "--package",
+                "pkg_name",
+                "--lib",
+                "--message-format=json",
+                "--no-run",
+                "--",
+                "test::it_works", 
+                "--show-output",
+            ]);
+            assert.notDeepStrictEqual(args.filter, undefined);
+        });
     });
 }
